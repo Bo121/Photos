@@ -8,77 +8,69 @@ import java.io.IOException;
 
 public class MyImage extends JPanel{
 
-    // 定义成员图片对象
-    BufferedImage bgImage; // 表示当前窗口要显示的图片
+    // Define a member image object
+    BufferedImage bgImage;
 
     public static void main(String[] args) {
-        // 创建窗口
+        // Create a window
         JFrame frame = new JFrame();
-        // 设置尺寸大小
+        // Set up the size of the window
         frame.setSize(1000, 700);
-        // 设置标题
+        // Set up the title
         frame.setTitle("Digital Album");
-        // 设置窗口居中
+        // Display the window in the middle 
         frame.setLocationRelativeTo(null);
-        // 关闭窗口，把JVM也停止
+        // Turn off the window, and stop the JVM
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // JFrame.EXIT_ON_CLOSE = 3, 所以括号内可以为3
 
-        // 创建面板对象
-        // JPanel jPanel = new JPanel();
-
-        // 创建面板对象
+        // Create a panel object
         MyImage myImage = new MyImage();
-        // 把面板对象存放到窗口上
+        // Place the panel object on the window.
         frame.add(myImage);
-        // 调用初始化图片的方法
+        // Call the method to initialize the image
         myImage.initImgs();
-        // 把图片画到窗口上去，调用绘图的方法
-        // 重绘
-        // myImage.repaint();
 
-        // 写方法，让ff一直变，让图片由浅变深，开启新的线程
+        // Write a method that continuously changes 'ff', making the image transition from light to dark, and start a new thread
         myImage.begin();
 
-        // 显示出窗口
+        // Make the window visible
         frame.setVisible(true);
     }
 
-    // 图片显示比例值
+    // Image display ratio value
     float ff = 0f;
 
-    // 标志，表示数组的下标索引值
+    // Define the index value of the array
     int num = 0;
 
     /**
-     * 让ff变量的值一直变
+     * Change the value of ff continuously 
      */
     public void begin() {
-        // 启动线程
+        // Start the thread
         new Thread(new Runnable() {
             @Override
             public void run() {
-                // 一直去改变ff的值
+                // Change the value of ff continuously 
                 while (true) {
-
-                    // 从数组中获取图片
+                    // Obtain the images from the array
                     bgImage = images[num];
-                    // 让 num 累加
+                    // increment the num
                     num++;
-                    // 考虑数组越界异常
+                    // if num is equal to 4
                     if (num == 4) {
                         num = 0;
                     }
                     while (true) {
                         if (ff < 100f) {
                             ff += 2f;
-                            // 调用重绘
                             repaint();
                         } else {
                             ff = 0f;
                             break;
                         }
 
-                        // 休眠
+                        // sleep
                         try {
                             Thread.sleep(75);
                         } catch (InterruptedException e) {
@@ -90,42 +82,37 @@ public class MyImage extends JPanel{
         }).start();
     }
 
-    // 需要重写父类的方法。提供绘画的方法。ctrl+o
-    // Graphic g 画笔 画图片
+    // Graphic g draw the images
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        // 转换成子类对象,提供了更多的方法
         Graphics2D graphics2D = (Graphics2D) g;
 
-        // 画什么东西
+        // What to draw
         if(bgImage != null) {
-
-            // 加入淡入的效果
+            // Add a fade-in effect
             graphics2D.setComposite(AlphaComposite.SrcOver.derive(ff / 100f));
-            // 把图片画到窗口上去
+            // Draw the image onto the window
             graphics2D.drawImage(bgImage, 0, 0, bgImage.getWidth(), bgImage.getHeight(), null);
         }
     }
 
-    // 定义图片类型数组
-    // BufferedImage 表示图片对象
+    // Define an array of image type
     BufferedImage[] images = new BufferedImage[4];
 
     /**
-     *  加载提前准备好的一些图片
+     *  Load some pre-prepared images
      */
     public void initImgs() {
         try {
-            // 编写for循环
             for (int i = 1; i <= 4; i++) {
-                // 每循环一次，都要加载一张图片
+                // Load an image for each iteration
                 BufferedImage image = ImageIO.read(MyImage.class.getResource("/images/bg" + i + ".png"));
-                // 每读取到一张图片对象，把它存放到数组中
+                // Every time an image object is read, store it in the array
                 images[i-1] = image;
             }
 
-            // 给成员变量赋值
+            // assign a value to the member variable
             bgImage = images[0];
         } catch (IOException e) {
             e.printStackTrace();
